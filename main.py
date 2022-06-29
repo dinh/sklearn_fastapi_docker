@@ -1,16 +1,31 @@
 import uvicorn
-from fastapi import FastAPI
-
+import pandas as pd
+from fastapi import FastAPI,File,UploadFile,HTTPException
+from fastapi.responses import JSONResponse
+from io import BytesIO
 # Third party imports
 from pydantic import BaseModel, Field
 from typing import List
 
-from ms.functions import get_model_response
+from ms.functions import get_model_response,batch_file_predict,prepare_data
 
 model_name = "Churn model"
 version = "v1.0.0"
 
-api = FastAPI()
+api = FastAPI(
+             title="Customer Churn Prediction API",
+             description="API powered by FastAPI.",
+             version="1.0.1",
+             openapi_tags=[
+    {
+        'name': 'API Check',
+        'description': 'default API check functions'
+    },
+    {
+        'name': 'Prediction Functions',
+        'description': 'functions that are used to predict customer churn'
+    }
+                           ])
 
 # Input for data validation
 class Input(BaseModel):
@@ -45,7 +60,7 @@ class Output(BaseModel):
     probability: float
 
 
-@api.get('/')
+@api.get('/',tags=['API Check'])
 async def model_info():
     """Return model information, version, how to call"""
     return {
@@ -54,7 +69,7 @@ async def model_info():
     }
 
 
-@api.get('/health')
+@api.get('/health', tags=['API Check'])
 async def service_health():
     """Return service health"""
     return {
@@ -62,8 +77,47 @@ async def service_health():
     }
 
 
-@api.post('/predict', response_model=Output)
+@api.post('/predict', response_model=Output, tags=['Prediction Functions'])
 async def model_predict(input: Input):
     """Predict with input"""
     response = get_model_response(input)
     return response
+
+# Define the response JSON
+class Result(BaseModel):
+     filename: str
+     content_type: str
+     predictions: str
+ 
+
+@api.post('/batch_predict',name="Batch File Churn Predict", tags=['Prediction Functions'],response_model=Result )
+
+async def batch_predict(file: UploadFile = File(...)):
+    """Predict with file input"""
+    # Ensure that the file is a CSV
+    if not file.content_type.startswith("application/vnd.ms-excel"):
+        raise HTTPException(status_code=400, detail="File format provided is not valid.")
+    contents = await file.read()
+    buffer = BytesIO(contents)
+    df = pd.read_csv(buffer)
+    buffer.close()
+    df_initial=df
+    data_clean = prepare_data(df)
+    response = batch_file_predict(data_clean,df_initial)
+    name=file.filename
+    result='data/result'
+    prediction_result='{}_{}'.format(result,name)
+    response.to_csv(prediction_result,sep='\t')
+    #return response.to_json()
+    return {
+        "filename": prediction_result,
+        "content_type": 'CSV file',
+        #"filename": file.filename,
+        #"content_type": file.content_type,  
+        "predictions": response.to_json()
+    }
+
+
+   
+   
+
