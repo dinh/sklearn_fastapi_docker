@@ -1,0 +1,6 @@
+	customerID	gender	SeniorCitizen	Partner	Dependents	tenure	PhoneService	MultipleLines	InternetService	OnlineSecurity	OnlineBackup	DeviceProtection	TechSupport	StreamingTV	StreamingMovies	Contract	PaperlessBilling	PaymentMethod	MonthlyCharges	TotalCharges	Predictions
+0	9076-AXYIK	1	0	1	0	64	1	Yes	Fiber optic	No	No	Yes	Yes	Yes	Yes	Two year	0	Electronic check	102.1	6538.45	No
+1	3278-FSIXX	0	0	0	0	2	1	No	DSL	No	No	No	No	No	No	Month-to-month	1	Mailed check	45.25	74.2	Yes
+2	6408-WHTEF	1	0	1	1	72	1	Yes	DSL	Yes	Yes	Yes	Yes	Yes	Yes	Two year	1	Mailed check	89.4	6376.55	No
+3	6032-IGALN	0	0	0	0	1	0	No phone service	DSL	No	No	No	No	No	No	Month-to-month	1	Mailed check	25.1	25.1	Yes
+4	0684-AOSIH	1	0	1	0	1	1	No	Fiber optic	Yes	No	No	No	Yes	Yes	Month-to-month	1	Electronic check	95.0	95.0	Yes

@@ -1,0 +1,6 @@
+	customerID	gender	SeniorCitizen	Partner	Dependents	tenure	PhoneService	MultipleLines	InternetService	OnlineSecurity	OnlineBackup	DeviceProtection	TechSupport	StreamingTV	StreamingMovies	Contract	PaperlessBilling	PaymentMethod	MonthlyCharges	TotalCharges	Predictions
+0	8773-HHXXX	0	1	0	1	6	1	Yes	DSL	Yes	Yes	Yes	Yes	Yes	Yes	Month-to-month	1	Electronic check	20	35.0	No
+1	5945-TMRGD	0	0	0	1	1	1	No	Fiber optic	No	No	No	No	Yes	No	Month-to-month	1	Electronic check	80	90.0	Yes
+2	7942-YXOOG	1	0	0	0	5	1	No	No	No internet service	No internet service	No internet service	No internet service	No internet service	No internet service	Month-to-month	0	Mailed check	20	115.0	No
+3	4598-ABCDE	0	1	1	1	25	1	No	Fiber optic	No	Yes	Yes	No	Yes	No	One year	1	Electronic check	100	2500.0	Yes
+4	3192-NQECA	1	0	1	0	68	1	Yes	Fiber optic	No	Yes	Yes	Yes	Yes	Yes	Two year	1	Bank transfer (automatic)	117	600.0	No

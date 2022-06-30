@@ -1,0 +1,4 @@
+	customerID	gender	SeniorCitizen	Partner	Dependents	tenure	PhoneService	MultipleLines	InternetService	OnlineSecurity	OnlineBackup	DeviceProtection	TechSupport	StreamingTV	StreamingMovies	Contract	PaperlessBilling	PaymentMethod	MonthlyCharges	TotalCharges	Predictions
+0	7010-BRBUU	1	0	1	1	72	1	Yes	No	No internet service	No internet service	No internet service	No internet service	No internet service	No internet service	Two year	0	Credit card (automatic)	24.1	1734.65	No
+1	9688-YGXVR	0	0	0	0	44	1	No	Fiber optic	No	Yes	Yes	No	Yes	No	Month-to-month	1	Credit card (automatic)	88.15	3973.2	No
+2	9286-DOJGF	0	1	1	0	38	1	Yes	Fiber optic	No	No	No	No	No	No	Month-to-month	1	Bank transfer (automatic)	74.95	2869.85	Yes
