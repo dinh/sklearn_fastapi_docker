@@ -80,8 +80,7 @@ async def service_health():
 @api.post('/predict', response_model=Output, tags=['Prediction Functions'])
 async def model_predict(input: Input):
     """Predict with input"""
-    response = get_model_response(input)
-    return response
+    return get_model_response(input)
 
 # Define the response JSON
 class Result(BaseModel):
@@ -91,7 +90,6 @@ class Result(BaseModel):
  
 
 @api.post('/batch_predict',name="Batch File Churn Predict", tags=['Prediction Functions'],response_model=Result )
-
 async def batch_predict(file: UploadFile = File(...)):
     """Predict with file input"""
     # Ensure that the file is a CSV
@@ -106,7 +104,7 @@ async def batch_predict(file: UploadFile = File(...)):
     response = batch_file_predict(data_clean,df_initial)
     name=file.filename
     result='data/result'
-    prediction_result='{}_{}'.format(result,name)
+    prediction_result = f'{result}_{name}'
     response.to_csv(prediction_result,sep='\t')
     #return response.to_json()
     return {
