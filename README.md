@@ -1,66 +1,84 @@
-# Churn API
-Deployment of the Churn ML models using Python's Scikit-Learn + FastAPI + Docker
+# Description
+Ce projet est un exemple de déploiement du modèle de machine learning de prédiction de churn.
+Le projet conntient deux applications dockerisées: 
+* une API avec le framework Fastapi
+* une application Web avec le framework Flask
 
-# Dataset
-##Churn  Dataset
+# Démarage rapide
+## Exécution de l'application dans un container 
 
-The dataset can be found in `data/churn.csv`
+* Installer ou mettre à jour Docker et Docker Compose pour disposer des dernières versions
+* Installer make avec `sudo apt-get install make`
+* Cloner le repo et aller dans le répertoire racine et exécuter `make up`
+
+L'interface Web pour la prédiction de churn est à présent accessible à l'adresse suivante: ```http://127.0.0.1:8020/```
+
+La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.1:8000/docs`
+
+* Pour arrêter les services: `make stop`
+* Pour arrêter les services et supprimer les volumes: `make down`
+
+# Structure des répertoires
+
+sklearn_fastapi_docker        # racine du projet
+├─ backend/                   # code de l'API et de du script train.py qui entraine et sauvegarde le modèle
+│  ├─ app/
+│  │  ├─ core/
+│  │  │  ├─ schemas/          # schémas pydendic
+│  │  │  ├─ settings.py       # fichier de configuration
+│  │  ├─ datasets/            # datasets pour l'entrainement
+│  │  ├─ helpers/             # fonctions utilitaires
+│  │  ├─ modeles/             # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring
+│  │  ├─ tests/
+│  │  │  ├─ fixtures/         # données de tests
+│  │  │  │  ├─ datasets/
+│  │  │  ├─ modeles/          # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring
+    
+├─ frontend/                  # code de la Webapp (UI)
+│  ├─ app/
+│  │  ├─ statics/             # éléments statiques: css, javascript, images ...
+│  │  │  ├─ styles/
+│  │  ├─ templates/           # templates flask
 
 
-### Attribute Information:
+# Développement
 
-    tenure: int
-    paperless_billing: int
-    internet_service_fiber_optic: int
-    no_internet_service: int
-    online_security: int
-    device_protection: int
-    contract_month_to_month: int
-    payment_method_electronic_check: int
+## Environnement virtuel
 
-# Virtual Environment
+Installer virtualenv: `$ pip install virtualenv`
 
-Firt we need to create a virtual environment for the project, to keep track of every dependency, it is also useful to use and explicit version of Python
+Vous pouvez installer un environnement virtuel pour chacune des applications frontend et backend.
+Lorsque vous êtes dans l'une des répertoires, faire:
 
-Install the package for creating a virtual environment:
-`$ pip install virtualenv`
-
-Create a new virtual environment
 `$ virtualenv venv`
 
-Activate virtual environment
+Pour pour activer un environnement virtuel:
+
 `$ source venv/bin/activate`
 
-# Python packages
-
-Now with the virtual environment we can install the dependencies written in requirements.txt
+# Installation des dépendances 
 
 `$ pip install -r requirements.txt`
 
-# Train
+## Backend
 
-After we have install all the dependencies we can now run the script in code/train.py, this script takes the input data and outputs a trained model and a pipeline for our web service.
+### Entrainement et sauvegarde du modèle
 
-`$ python train/train.py`
+```
+cd backend/app
+python train/train.py
+```
 
-The model will be saved in the `model` directory
+Le modèle sera sauvegardé dans le répertoire model.
 
-#API endpoints
+### API endpoints
 
-Finally we can test our api by running:
+Lancer le serveur:
 
-`$ uvicorn main:api`
+`$ uvicorn main:app`
 
-# Docker
+Vous pouvez tester les différents endpoints ici : http://localhost:8000/doc
 
-Now that we have our web application running, we can use the Dockerfile to create an image for running our web application inside a container
+### Test auto
 
-`$ docker build . -t sklearn_fastapi_docker`
-
-And now we can test our application using Docker
-
-`$ docker run -p 8000:8000 sklearn_fastapi_docker`
-
-# Test!
-
-Test by using the calls in tests/example_calls.txt from the terminal
+Exécuter la commande `pytest` n'importe où dans le répertoire backend

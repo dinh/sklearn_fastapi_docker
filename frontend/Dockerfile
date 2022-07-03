@@ -1,0 +1,10 @@
+# frontend/Dockerfile
+FROM python:3.10.5-slim-bullseye
+
+WORKDIR /app
+ENV FLASK_APP=main.py
+COPY requirements.txt /app
+RUN python -m pip install --upgrade pip
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+COPY app /app
+CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0"]

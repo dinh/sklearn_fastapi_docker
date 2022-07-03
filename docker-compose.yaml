@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: frontend
+    ports:
+      - "8020:5000"
+    environment:
+      FLASK_APP: "main.py"
+    depends_on:
+      - backend
+  backend:
+    build: backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./datasets:/datasets
+      - ./models:/models
