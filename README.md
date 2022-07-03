@@ -20,25 +20,26 @@ La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.
 
 # Structure des répertoires
 
-sklearn_fastapi_docker        # racine du projet
-├─ backend/                   # code de l'API et de du script train.py qui entraine et sauvegarde le modèle
-│  ├─ app/
-│  │  ├─ core/
-│  │  │  ├─ schemas/          # schémas pydendic
-│  │  │  ├─ settings.py       # fichier de configuration
-│  │  ├─ datasets/            # datasets pour l'entrainement
-│  │  ├─ helpers/             # fonctions utilitaires
-│  │  ├─ modeles/             # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring
-│  │  ├─ tests/
-│  │  │  ├─ fixtures/         # données de tests
-│  │  │  │  ├─ datasets/
-│  │  │  ├─ modeles/          # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring
-    
-├─ frontend/                  # code de la Webapp (UI)
-│  ├─ app/
-│  │  ├─ statics/             # éléments statiques: css, javascript, images ...
-│  │  │  ├─ styles/
-│  │  ├─ templates/           # templates flask
+
+    sklearn_fastapi_docker        # racine du projet  
+    ├─ backend/                   # code de l'API et de du script train.py qui entraine et sauvegarde le modèle  
+    │  ├─ app/  
+    │  │  ├─ core/  
+    │  │  │  ├─ schemas/          # schémas pydendic  
+    │  │  │  ├─ settings.py       # fichier de configuration  
+    │  │  ├─ datasets/            # datasets pour l'entrainement  
+    │  │  ├─ helpers/             # fonctions utilitaires  
+    │  │  ├─ modeles/             # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring  
+    │  │  ├─ tests/  
+    │  │  │  ├─ fixtures/         # données de tests  
+    │  │  │  │  ├─ datasets/  
+    │  │  │  ├─ modeles/          # contient le modèle de ML généré, la dernière version du modèle, et l'historique du scoring  
+          
+    ├─ frontend/                  # code de la Webapp (UI)  
+    │  ├─ app/  
+    │  │  ├─ statics/             # éléments statiques: css, javascript, images ...  
+    │  │  │  ├─ styles/  
+    │  │  ├─ templates/           # templates flask
 
 
 # Développement
