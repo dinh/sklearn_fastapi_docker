@@ -1,11 +1,11 @@
 # Description
 Ce projet est un exemple de déploiement du modèle de machine learning de prédiction de churn.
-Le projet conntient deux applications dockerisées: 
+Le projet content deux applications dockerisées : 
 * une API avec le framework Fastapi
 * une application Web avec le framework Flask
 
 # Démarage rapide
-## Exécution de l'application dans un container 
+## Exécution de l'application dans un conteneur 
 
 * Installer ou mettre à jour Docker et Docker Compose pour disposer des dernières versions
 * Installer make avec `sudo apt-get install make`
@@ -48,35 +48,42 @@ La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.
 
 Installer virtualenv: `$ pip install virtualenv`
 
-Vous pouvez installer un environnement virtuel pour chacune des applications frontend et backend.
-Lorsque vous êtes dans l'une des répertoires, faire:
+Vous pouvez installer un environnement virtuel pour chacune des applications.
+Lorsque vous êtes dans l'une des répertoires frontend ou backend, exécuter :
 
 `$ virtualenv venv`
 
-Pour pour activer un environnement virtuel:
+puis
 
 `$ source venv/bin/activate`
 
-# Installation des dépendances 
+pour activer un environnement virtuel.
 
-`$ pip install -r requirements.txt`
 
 ## Backend
+
+### Installation des dépendances
+
+```
+$  cd backend/app
+$ pip install -r requirements.txt
+$  python train/train.py
+```
 
 ### Entrainement et sauvegarde du modèle
 
 ```
-cd backend/app
-python train/train.py
+$  cd backend/app
+$  python train/train.py
 ```
 
 Le modèle sera sauvegardé dans le répertoire model.
 
 ### API endpoints
 
-Lancer le serveur:
+Lancer le serveur :
 
-`$ uvicorn main:app`
+`$ uvicorn main:app --reload --debug`
 
 Vous pouvez tester les différents endpoints ici : http://localhost:8000/doc
 
