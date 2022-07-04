@@ -124,7 +124,6 @@ def docs_redirect():
 async def model_info():
     """Return model information"""
     return JSONResponse(content={
-        "status_code": 200,
         "name": MODEL_NAME,
         "version": MODEL_VERSION,
         "description": "Predict churn based on customer data",
@@ -134,12 +133,7 @@ async def model_info():
 
 @app.get('/healthcheck')
 def healthcheck():
-    """Health check."""
-    return JSONResponse(content={
-        # The status code of the response.
-        "status_code": 200,
-        "detail": "OK"
-    })
+    return JSONResponse(content={"detail": "OK"})
 
 
 @app.post('/predict', response_model=ChurnPrediction, name='Predict churner', tags=['predict'])
@@ -159,19 +153,13 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
     if request.method == "POST":
         # Ensure that the file is a CSV
         if not file.content_type.startswith("text/csv"):
-            return JSONResponse(content={
-                "status_code": 415,
-                "detail": "File must be in CSV format with comma separators"
-            })
+            raise HTTPException(status_code=415, detail="File must be in CSV format with comma separators")
 
         customer_data = await file.read()
         # TODO: check file fields
 
         if not customer_data:
-            return JSONResponse(content={
-                "status_code": 204,
-                "detail": "No content"
-            })
+            raise HTTPException(status_code=204, detail="No content")
 
     df_customer_data = batch_file_predict(customer_data, model_artifacts)
 
@@ -193,4 +181,4 @@ async def train(background_tasks: BackgroundTasks, commons: dict = Depends(commo
                               commons["model_metric_path"],
                               commons["model_version_path"], message="Model created")
 
-    return JSONResponse(content={"status_code": 200, "detail": "Model training job has been created!"})
+    return JSONResponse(content={"detail": "Model training job has been created!"})

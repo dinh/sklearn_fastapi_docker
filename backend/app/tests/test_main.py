@@ -50,7 +50,6 @@ def test_model_info():
     assert response.status_code == 200
     assert response.url == "http://testserver/info"
     assert response.json() == {
-        "status_code": 200,
         "name": "churn-model",
         "version": 1,
         "description": "Predict churn based on customer data",
@@ -63,7 +62,7 @@ def test_healthcheck():
     response = client.get("/healthcheck")
     assert response.status_code == 200
     assert response.url == "http://testserver/healthcheck"
-
+    assert response.json() == {"detail": "OK"}
 
 def test_predict():
     # We need the startup event handlers in these tests, so let's use TestClient with a with statement
@@ -109,7 +108,7 @@ def test_train():
         response = client.get("/train")
     assert response.status_code == 200
     assert response.url == "http://testserver/train"
-    assert response.json() == {"status_code": 200, "detail": "Model training job has been created!"}
+    assert response.json() == {"detail": "Model training job has been created!"}
 
 
 def test_limit_upload_size():
