@@ -13,10 +13,7 @@ services:
       - churn-api
   churn-api:
     build: backend
-    image: churn-api
+    image: churn/api
     ports:
       - "8000:8000"
     container_name: churn-api
-    volumes:
-      - ./datasets:/datasets
-      - ./models:/models

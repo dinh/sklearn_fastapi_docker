@@ -5,7 +5,7 @@ up:
 restart:
 	make build
 	make up
-down:
+stop:
 	docker-compose stop
 down:
 	docker-compose down --volumes
