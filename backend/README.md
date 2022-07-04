@@ -24,9 +24,11 @@ L'exécution de :
 
 ou de 
 
-`$ curl -X 'GET' \
+```
+$ curl -X 'GET' \
 'http://127.0.0.1:8000/train' \
--H 'accept: application/json'`
+-H 'accept: application/json'
+```
 
 génères trois fichiers :
 
