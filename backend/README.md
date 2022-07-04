@@ -1,8 +1,8 @@
 # API de prédiction du churn.
 
-# Entrainement et création du modèle de ML
+## Entrainement et création du modèle de ML
 
-## Données d'entrainement
+### Données d'entrainement
 Les données d'entrainement doivent être dans un fichier nommé churn.csv.
 Le contenu du fichier churn.csv est au format suivant :
 
@@ -16,7 +16,7 @@ customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MultipleL
 
 `$ cat churn.csv | docker exec churn-api bash -c 'cat > /app/datasets/churn.tmp; mv -f /app/datasets/churn.tmp datasets/churn.csv`
 
-## Entrainement et sauvegarde du modèle
+### Entrainement et sauvegarde du modèle
 
 L'exécution de :
 
@@ -60,6 +60,7 @@ curl -X 'POST' \
 ```
 
 où le fichier churn.csv est au format suivant :
+
 ```
 customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MultipleLines,InternetService,OnlineSecurity,OnlineBackup,DeviceProtection,TechSupport,StreamingTV,StreamingMovies,Contract,PaperlessBilling,PaymentMethod,MonthlyCharges,TotalCharges,Churn
 7010-BRBUU,Male,0,Yes,Yes,72,Yes,Yes,No,No internet service,No internet service,No internet service,No internet service,No internet service,No internet service,Two year,No,Credit card (automatic),24.1,1734.65,No
