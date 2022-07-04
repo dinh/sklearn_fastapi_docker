@@ -1,18 +1,22 @@
 version: "3.9"
 
 services:
-  frontend:
+  churn-frontend:
     build: frontend
+    image: churn/frontend
     ports:
       - "8020:5000"
+    container_name: churn-frontend
     environment:
       FLASK_APP: "main.py"
     depends_on:
-      - backend
-  backend:
+      - churn-api
+  churn-api:
     build: backend
+    image: churn-api
     ports:
       - "8000:8000"
+    container_name: churn-api
     volumes:
       - ./datasets:/datasets
       - ./models:/models

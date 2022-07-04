@@ -1,3 +1,3 @@
 # Description
 
-Webapp pour la prédiction
+Une simple Webapp utilisant l'API de prédiction

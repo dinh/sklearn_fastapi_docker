@@ -50,6 +50,7 @@ def test_model_info():
     assert response.status_code == 200
     assert response.url == "http://testserver/info"
     assert response.json() == {
+        "status_code": 200,
         "name": "churn-model",
         "version": 1,
         "description": "Predict churn based on customer data",
@@ -85,11 +86,11 @@ def test_predict():
         assert "label" in response.json()
         assert "prediction" in response.json()
         assert "label", "probability" in response.json()
-
+        # Warning: don't change the test model artifact or this will fail
         # assert response.json() == {
-        #    "label": "churner",
-        #    "prediction": 1,
-        #    "probability": 0.71
+        #     "label": "churner",
+        #     "prediction": 1,
+        #     "probability": 0.65
         # }
 
 
@@ -108,7 +109,7 @@ def test_train():
         response = client.get("/train")
     assert response.status_code == 200
     assert response.url == "http://testserver/train"
-    assert response.json() == {"message": "Model training job has been created!"}
+    assert response.json() == {"status_code": 200, "detail": "Model training job has been created!"}
 
 
 def test_limit_upload_size():

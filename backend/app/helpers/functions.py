@@ -27,6 +27,7 @@ def get_churn_prediction(customer_data, model):
     probability = model.predict_proba(X.values)[0][prediction]
     label = "churner" if prediction == 1 else "non churner"
     return {
+        'status_code': 200,
         'label': label,
         'prediction': int(prediction),
         'probability': round(probability, 2)

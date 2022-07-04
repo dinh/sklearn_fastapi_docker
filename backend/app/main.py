@@ -27,7 +27,7 @@ You can predict the churn status of a user based on his data.
 
 ## Train model
 
-Whenever the datasets change, you can retrain the model
+Whenever the datasets change, you can retrain the model. The training is done in the backgound.
 """
 
 tags_metadata = [
@@ -122,8 +122,9 @@ def docs_redirect():
 
 @app.get('/info')
 async def model_info():
-    """Return model information, version, how to call"""
+    """Return model information"""
     return JSONResponse(content={
+        "status_code": 200,
         "name": MODEL_NAME,
         "version": MODEL_VERSION,
         "description": "Predict churn based on customer data",
@@ -135,6 +136,7 @@ async def model_info():
 def healthcheck():
     """Health check."""
     return JSONResponse(content={
+        # The status code of the response.
         "status_code": 200,
         "detail": "OK"
     })
@@ -191,4 +193,4 @@ async def train(background_tasks: BackgroundTasks, commons: dict = Depends(commo
                               commons["model_metric_path"],
                               commons["model_version_path"], message="Model created")
 
-    return JSONResponse(content={"message": "Model training job has been created!"})
+    return JSONResponse(content={"status_code": 200, "detail": "Model training job has been created!"})
