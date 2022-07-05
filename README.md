@@ -18,7 +18,10 @@ La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.
 * Pour arrêter les services: `make stop`
 * Pour arrêter les services et supprimer les volumes: `make down`
 
-# Structure des répertoires
+
+# Développement
+
+## Structure des répertoires
 
 
     sklearn_fastapi_docker        # racine du projet  
@@ -41,8 +44,6 @@ La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.
     │  │  │  ├─ styles/  
     │  │  ├─ templates/           # templates flask
 
-
-# Développement
 
 ## Environnement virtuel
 
