@@ -4,7 +4,7 @@ Le projet content deux applications dockerisées :
 * une API avec le framework Fastapi
 * une application Web avec le framework Flask
 
-# Démarage rapide
+# Démarrage rapide
 ## Exécution de l'application dans un conteneur 
 
 * Installer ou mettre à jour Docker et Docker Compose pour disposer des dernières versions
@@ -81,11 +81,24 @@ Le modèle sera sauvegardé dans le répertoire model.
 
 ### API endpoints
 
-Lancer le serveur :
+#### Lancer le serveur
+
+Dans le répertoire backend/app, exécuter :
 
 `$ uvicorn main:app --reload --debug`
 
 Vous pouvez tester les différents endpoints ici : http://localhost:8000/doc
+
+## Frontend - Webapp
+
+#### Lancer l'application
+
+Dans le répertoire frontend/app, exécuter :
+
+`$ python main.py`
+
+L'application est disponible à l'adresse suivante : http://localhost:5000/
+
 
 ### Test auto
 
