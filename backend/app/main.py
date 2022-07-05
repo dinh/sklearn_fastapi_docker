@@ -182,3 +182,7 @@ async def train(background_tasks: BackgroundTasks, commons: dict = Depends(commo
                               commons["model_version_path"], message="Model created")
 
     return JSONResponse(content={"detail": "Model training job has been created!"})
+
+
+if __name__ == "__main__":
+    run(app, host="0.0.0.0", port=8000)
