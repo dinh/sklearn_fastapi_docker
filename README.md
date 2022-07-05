@@ -85,9 +85,11 @@ Le modèle sera sauvegardé dans le répertoire model.
 
 Dans le répertoire backend/app, exécuter :
 
-`$ uvicorn main:app --reload --debug`
+`$ uvicorn main:app --host 0.0.0.0 --port 8000 --reload --debug`
 
-Vous pouvez tester les différents endpoints ici : http://localhost:8000/doc
+Vous pouvez tester les différents endpoints à l'adresse : `http://localhost:8000/docs` ou `http://<l'ip publique de votre machine>:8000/docs`
+
+Pour trouver l'ip pubique de votre serveur, exécuter `curl ifconfig.me` dans la ligne de commande du terminal.
 
 ## Frontend - Webapp
 
