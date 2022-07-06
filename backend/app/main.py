@@ -1,9 +1,9 @@
 import errno
 import io
 import os
-from typing import Union
 
 import joblib
+import pandas as pd
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTasks
@@ -77,16 +77,14 @@ class LimitUploadSize(BaseHTTPMiddleware):
         if request.method == 'POST':
             if 'content-length' not in request.headers:
                 return JSONResponse(content={
-                    "status_code": 411,
                     "detail": "Length Required"
-                })
+                }, status_code=411)
 
             content_length = int(request.headers['content-length'])
             if content_length > self.max_upload_size:
                 return JSONResponse(content={
-                    "status_code": 412,
                     "detail": "Request entity is too large. Payload must be less than 10MB"
-                })
+                }, status_code=412)
 
         return await call_next(request)
 
@@ -163,6 +161,8 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
             raise HTTPException(status_code=204, detail="No content")
 
     df_customer_data = batch_file_predict(customer_data, model_artifacts)
+    if not isinstance(df_customer_data, pd.DataFrame):
+        raise HTTPException(status_code=422, detail=df_customer_data)
 
     # https://stackoverflow.com/questions/61140398/fastapi-return-a-file-response-with-the-output-of-a-sql-query
     stream = io.StringIO()
