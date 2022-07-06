@@ -12,6 +12,8 @@ customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MultipleL
 9688-YGXVR,Female,0,No,No,44,Yes,No,Fiber optic,No,Yes,Yes,No,Yes,No,Month-to-month,Yes,Credit card (automatic),88.15,3973.2,No
  ```
 
+> note : si les valeurs de la colonne Churn est renseignée, l'API batch-predict permet de comparer la prédiction avec le statut de churn réel de l'utilisateur.  
+
 ### Copier le fichier dans le répertoire /app/datasets/ du conteneur
 
 `$ cat churn.csv | docker exec churn-api bash -c 'cat > /app/datasets/churn.tmp; mv -f /app/datasets/churn.tmp datasets/churn.csv`

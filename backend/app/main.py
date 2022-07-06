@@ -152,7 +152,7 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
     global model_artifacts
     if request.method == "POST":
         # Ensure that the file is a CSV
-        if not file.content_type.startswith("text/csv"):
+        if not file.content_type.startswith("text/csv") or  not file.content_type.startswith("application/vnd.ms-excel"):
             raise HTTPException(status_code=415, detail="File must be in CSV format with comma separators")
 
         customer_data = await file.read()
