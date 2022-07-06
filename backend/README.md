@@ -12,8 +12,8 @@ customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MultipleL
 9688-YGXVR,Female,0,No,No,44,Yes,No,Fiber optic,No,Yes,Yes,No,Yes,No,Month-to-month,Yes,Credit card (automatic),88.15,3973.2,No
  ```
 
-* Ce format est issu du fichier qui nous a été fourni lors du premier projet
-* Toutes les colonnes sont requises, même s'il n'y a pas de valeur
+* Ce format est issu du fichier qui nous a été fourni lors du premier projet de datascience.
+* Toutes les colonnes sont requises, même s'il n'y a pas de valeur.
 * Si les valeurs de la colonne Churn est renseignée, l'API batch-predict permet de comparer la prédiction avec le statut de churn réel de l'utilisateur.  
 
 ### Copier le fichier dans le répertoire /app/datasets/ du conteneur
@@ -53,7 +53,7 @@ $ docker exec churn-api cat models/churn-model-latest-version.txt > churn-model-
 
 ## Prédiction par bacth
 
-Il est possible de faire des prédictions par lot (batch) en utilsant l'API `/bacth-predict` :
+Il est possible de faire des prédictions par lot (batch) en utilsant le point de terminaison `/bacth-predict` :
 
 ```
 curl -X 'POST' \
