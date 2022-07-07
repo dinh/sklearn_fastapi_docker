@@ -91,8 +91,7 @@ async def service_health():
 @api.post('/predict', response_model=Output, tags=['Prediction Functions'])
 async def model_predict(input: Input):
     """Predict with input"""
-    response = get_model_response(input)
-    return response
+    return get_model_response(input)
 
 # Define the response JSON
 class Result(BaseModel):
@@ -108,13 +107,12 @@ responses = {
 }
 
 @api.post('/batch_predict',name="Batch File Churn Predict", tags=['Prediction Functions'],response_model=Result,responses=responses )
-
 async def batch_predict(file: UploadFile = File(...)):
     """Predict with file input"""
     # Ensure that the file is a CSV
     if not file.content_type.startswith("text/csv") and not file.content_type.startswith("application/vnd.ms-excel"):
             raise HTTPException(status_code=415, detail="File must be in CSV format with comma separators")
-     
+
     contents = await file.read()
     #buffer = BytesIO(contents)
     #df = pd.read_csv(buffer)
@@ -151,8 +149,12 @@ async def batch_predict(file: UploadFile = File(...)):
     # Create required features columns if missing
     for column in expected_columns:
         if column not in df:
-            raise HTTPException(status_code=415, detail="Mandatory Columns are customerID,gender,SeniorCitizen,Partner, Dependents, tenure, PhoneService, MultipleLines,InternetService,OnlineSecurity,OnlineBackup,DeviceProtection, TechSupport,StreamingTV,StreamingMovies, Contract,PaperlessBilling,PaymentMethod,MonthlyCharges,TotalCharges.Missing column {}".format(column))
-     
+            raise HTTPException(
+                status_code=415,
+                detail=f"Mandatory Columns are customerID,gender,SeniorCitizen,Partner, Dependents, tenure, PhoneService, MultipleLines,InternetService,OnlineSecurity,OnlineBackup,DeviceProtection, TechSupport,StreamingTV,StreamingMovies, Contract,PaperlessBilling,PaymentMethod,MonthlyCharges,TotalCharges.Missing column {column}",
+            )
+
+
     data_clean = prepare_data(df)
     output = batch_file_predict(data_clean,df_initial)
     stream = io.StringIO()
@@ -161,6 +163,6 @@ async def batch_predict(file: UploadFile = File(...)):
                                  media_type="text/csv"
                                  )
     response.headers["Content-Disposition"] = "attachment; filename=predictions-export.csv"
-    response.headers["Access-Control-Expose-Headers"] = "Content-Disposition" 
+    response.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
     response.headers["predictions"]= output.to_json()
     return response

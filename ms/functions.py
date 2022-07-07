@@ -13,8 +13,7 @@ def load_model():
 
 
 def predict(X, model):
-    prediction = model.predict(X)[0]
-    return prediction
+    return model.predict(X)[0]
 
 model = joblib.load("model/model_binary.dat.gz")
 
@@ -24,10 +23,7 @@ def get_model_response(input):
 
     prediction = predict(X.values, model)
     probability = model.predict_proba(X.values)[0][prediction]
-    if prediction == 1:
-        label = "churner"
-    else:
-        label = "non churner"
+    label = "churner" if prediction == 1 else "non churner"
     return {
         'label': label,
         'prediction': int(prediction),
@@ -99,10 +95,7 @@ def batch_file_predict(clean_data,df_initial):
     prediction_df = pd.DataFrame(prediction, columns=["Predictions"])
     prediction_df = prediction_df.replace({1:'Yes',
                                            0:'No'})
-    #file="data/batch_churn.csv"
-    #df = pd.read_csv(file)
-    output = pd.concat([df_initial,prediction_df], axis = 1)
-    return output
+    return pd.concat([df_initial,prediction_df], axis = 1)
 	 
        
 
