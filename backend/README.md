@@ -51,7 +51,7 @@ $ docker exec churn-api cat models/churn-model-latest-version.txt > churn-model-
 > La création du fichier du modèle ML est "safe". Lors de l'opération d'entrancement, un fichier temporaire est créé.
 > Une fois le fichier est créé, on remplace le fichier churn-model.dat.gz par une opération atomique.
 
-## Prédiction par bacth
+## Prédiction par batch
 
 Il est possible de faire des prédictions par lot (batch) en utilsant le point de terminaison `/bacth-predict` :
 
