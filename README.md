@@ -15,8 +15,7 @@ L'interface Web pour la prédiction de churn est à présent accessible à l'adr
 
 La documentation de l'API est accessible à l'adresse suivante: `http://127.0.0.1:8000/docs`
 
-* Pour arrêter les services: `make stop`
-* Pour arrêter les services et supprimer les volumes: `make down`
+Pour arrêter les services: `make stop`
 
 
 # Développement
