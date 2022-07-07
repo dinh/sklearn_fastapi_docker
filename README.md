@@ -49,7 +49,7 @@ Pour arrêter les services: `make stop`
 Installer virtualenv: `$ pip install virtualenv`
 
 Vous pouvez installer un environnement virtuel pour chacune des applications.
-Lorsque vous êtes dans l'une des répertoires frontend ou backend, exécuter :
+Lorsque vous êtes dans l'un des répertoires frontend ou backend, exécuter :
 
 `$ virtualenv venv`
 
