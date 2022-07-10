@@ -18,10 +18,24 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def predict(X, model):
+    """
+    It takes in a model and a data point, and returns the model's prediction for that data point
+
+    :param X: The input data
+    :param model: the model to use for prediction
+    :return: The predicted value of the first row of the dataframe X
+    """
     return model.predict(X)[0]
 
 
 def get_churn_prediction(customer_data, model):
+    """
+    It takes a customer data object and a model, and returns a dictionary with the prediction, probability, and label
+
+    :param customer_data: a Customer object
+    :param model: the model we trained in the previous step
+    :return: A dictionary with the label, prediction and probability of the customer churning.
+    """
     X = pd.json_normalize(customer_data.__dict__)
     prediction = predict(X.values, model)
     probability = model.predict_proba(X.values)[0][prediction]
@@ -34,6 +48,18 @@ def get_churn_prediction(customer_data, model):
 
 
 def prepare_churn_dataset(df):
+    """
+    It takes a dataframe and returns a dataframe with the same columns, but with the following changes:
+
+    - The customerID column is dropped
+    - The gender, Partner, Dependents, PhoneService, Churn, and PaperlessBilling columns are converted to boolean values
+    - The TotalCharges column is converted to a float
+    - The remaining columns are converted to dummy variables
+    - The resulting dataframe is reordered to match the column order in the selected_features list
+
+    :param df: The dataframe to be processed
+    :return: A dataframe with the selected features
+    """
     # Preselected feature
     selected_features = [
         'tenure',
@@ -75,6 +101,14 @@ def prepare_churn_dataset(df):
 
 
 def train_and_save_model(df, model_path, model_metric_path, model_version_path):
+    """
+    It takes a dataframe, trains a model, and saves the model to a file
+
+    :param df: The dataframe containing the data to train the model on
+    :param model_path: The path to the model file
+    :param model_metric_path: The path to the file where we'll store the model's accuracy
+    :param model_version_path: The path to the file that stores the model version
+    """
     X, y = df.drop("Churn", axis=1), df.Churn
     # Split into train and test set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
@@ -135,6 +169,13 @@ def train_and_save_model(df, model_path, model_metric_path, model_version_path):
 
 
 def batch_file_predict(customer_data, model):
+    """
+    It takes a CSV file as input, and returns a CSV file as output
+
+    :param customer_data: The data to be predicted
+    :param model: The model object that you created in the previous step
+    :return: A dataframe with the customerID, Churn, and Prediction columns.
+    """
     buffer = BytesIO(customer_data)
     df = pd.read_csv(buffer)
     buffer.close()
@@ -180,8 +221,17 @@ def batch_file_predict(customer_data, model):
 
 
 def execute_pipeline(dataset_path, model_path, model_metric_path, model_version_path, message=""):
+    """
+    It reads the dataset, prepares it, trains a model and saves it
+
+    :param dataset_path: the path to the dataset
+    :param model_path: the path to save the model
+    :param model_metric_path: The path to the model metrics file
+    :param model_version_path: The path to the model version file
+    :param message: a string that will be printed to the console when the task is finished
+    """
     df = pd.read_csv(dataset_path)
     df = prepare_churn_dataset(df)
     train_and_save_model(df, model_path, model_metric_path, model_version_path)
-    # TODO: send notification when task finish
+    # TODO: send notification when the task has finished
     print(message)
