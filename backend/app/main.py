@@ -4,14 +4,13 @@ import os
 
 import joblib
 import pandas as pd
-from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, Header
+from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTasks
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, StreamingResponse, JSONResponse, Response
 from starlette.types import ASGIApp
-
 from uvicorn import run
 
 from core.schemas.schema import ChurnPrediction, CustomerData
@@ -74,6 +73,17 @@ class LimitUploadSize(BaseHTTPMiddleware):
         self.max_upload_size = max_upload_size
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        """
+        If the request is a POST request, and the content-length header is not present, return a 411 Length Required
+        response. If the content-length header is present, and the value is greater than the max_upload_size, return a 412
+        Request Entity Too Large response
+
+        :param request: The incoming request object
+        :type request: Request
+        :param call_next: The next endpoint in the pipeline
+        :type call_next: RequestResponseEndpoint
+        :return: A JSONResponse object
+        """
         if request.method == 'POST':
             if 'content-length' not in request.headers:
                 return JSONResponse(content={
@@ -88,7 +98,7 @@ class LimitUploadSize(BaseHTTPMiddleware):
 
         return await call_next(request)
 
-
+# Limite la taille des fichiers uploadés à 10MB
 app.add_middleware(
     LimitUploadSize,
     max_upload_size=10_000_000  # ~10MB
@@ -137,7 +147,13 @@ def healthcheck():
 @app.post('/predict', response_model=ChurnPrediction, name='Predict churner', tags=['predict'])
 async def predict(request: Request, payload: CustomerData):
     """
-    Takes in a `CustomerData` object, and returns a prediction
+    It takes in a `CustomerData` object, and returns a prediction
+
+    :param request: The request object that was sent to the server
+    :type request: Request
+    :param payload: The data that is passed in the request body
+    :type payload: CustomerData
+    :return: a churn prediction.
     """
     global model_artifacts
     if request.method == "POST":
@@ -146,6 +162,15 @@ async def predict(request: Request, payload: CustomerData):
 
 @app.post('/batch-predict', name='Moke predictions in batch', tags=['predict'])
 async def predict_batch(request: Request, file: UploadFile = File(...)):
+    """
+    It takes a CSV file as input, makes predictions on the data, and returns a CSV file with the predictions
+
+    :param request: Request: The incoming request
+    :type request: Request
+    :param file: the customer data in the same
+    :type file: UploadFile
+    :return: A StreamingResponse object is being returned.
+    """
     """Predict with file input"""
     global model_artifacts
     if request.method == "POST":
@@ -155,7 +180,6 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
             raise HTTPException(status_code=415, detail="File must be in CSV format with comma separators")
 
         customer_data = await file.read()
-        # TODO: check file fields
 
         if not customer_data:
             raise HTTPException(status_code=204, detail="No content")
@@ -178,6 +202,15 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
 
 @app.get('/train', name='Train model', tags=['train'])
 async def train(background_tasks: BackgroundTasks, commons: dict = Depends(common_parameters)):
+    """
+    It creates a background task that will execute the pipeline, and returns a response to the user
+
+    :param background_tasks: BackgroundTasks - this is a FastAPI dependency that allows us to run tasks in the background
+    :type background_tasks: BackgroundTasks
+    :param commons: dict = Depends(common_parameters)
+    :type commons: dict
+    :return: A JSONResponse object
+    """
     background_tasks.add_task(execute_pipeline, commons["dataset_path"], commons["model_path"],
                               commons["model_metric_path"],
                               commons["model_version_path"], message="Model created")
