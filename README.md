@@ -1,6 +1,6 @@
 # Description
 Ce projet est un exemple de déploiement du modèle de machine learning de prédiction de churn.
-Le projet content deux applications dockerisées : 
+Le projet se compose de deux applications dockerisées : 
 * une API avec le framework Fastapi
 * une application Web avec le framework Flask
 
