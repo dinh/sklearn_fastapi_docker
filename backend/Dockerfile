@@ -1,5 +1,5 @@
 # backend/Dockerfile
-FROM python:3.8.13-slim-bullseye
+FROM python:3.12.0a4-slim-bullseye
 
 WORKDIR /app
 
