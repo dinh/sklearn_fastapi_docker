@@ -1,5 +1,5 @@
 # frontend/Dockerfile
-FROM python:3.12.0a5-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 ENV FLASK_APP=main.py
