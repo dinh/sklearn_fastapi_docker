@@ -1,5 +1,5 @@
-import errno
 import io
+import logging
 import os
 
 import joblib
@@ -15,7 +15,10 @@ from uvicorn import run
 
 from core.schemas.schema import ChurnPrediction, CustomerData
 from core.settings import *
-from helpers.functions import get_churn_prediction, batch_file_predict, execute_pipeline
+from helpers.functions import (get_churn_prediction, batch_file_predict, execute_pipeline,
+                               read_model_version, read_model_manifest)
+
+logger = logging.getLogger(__name__)
 
 description = """
 The Churn API helps you predict churners. 🚀
@@ -49,11 +52,13 @@ app = FastAPI(
 
 
 async def common_parameters():
+    # Read the module-level paths at call time so they can be redirected (e.g. in tests)
     return {
         "dataset_path": DATASET_PATH,
         "model_path": MODEL_PATH,
         "model_metric_path": MODEL_METRIC_PATH,
-        "model_version_path": MODEL_VERSION_PATH
+        "model_version_path": MODEL_VERSION_PATH,
+        "model_manifest_path": MODEL_MANIFEST_PATH,
     }
 
 
@@ -75,7 +80,7 @@ class LimitUploadSize(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """
         If the request is a POST request, and the content-length header is not present, return a 411 Length Required
-        response. If the content-length header is present, and the value is greater than the max_upload_size, return a 412
+        response. If the content-length header is present, and the value is greater than the max_upload_size, return a 413
         Request Entity Too Large response
 
         :param request: The incoming request object
@@ -94,7 +99,7 @@ class LimitUploadSize(BaseHTTPMiddleware):
             if content_length > self.max_upload_size:
                 return JSONResponse(content={
                     "detail": "Request entity is too large. Payload must be less than 10MB"
-                }, status_code=412)
+                }, status_code=413)
 
         return await call_next(request)
 
@@ -107,20 +112,37 @@ app.add_middleware(
 model_artifacts = None
 
 
+def load_model_from_disk(model_path):
+    """
+    Loads the trained pipeline into memory.
+
+    If no model file exists yet, the API still starts: it reports `model_loaded: false`
+    and the prediction endpoints return 503 until a model is trained through /train.
+    """
+    global model_artifacts
+
+    if not os.path.exists(model_path):
+        model_artifacts = None
+        logger.warning("No model found at %s; prediction is unavailable until a model is trained.", model_path)
+        return False
+
+    model_artifacts = joblib.load(model_path)
+    logger.info("Model loaded from %s", model_path)
+    return True
+
+
 @app.on_event("startup")
 async def load_model_artifacts():
     """
     > Load the model artifacts from the model directory
     """
-    global model_artifacts
-
     if model_artifacts is None:
-        if os.path.exists(MODEL_PATH):
-            model_artifacts = joblib.load(MODEL_PATH)
-            print("Ready for inference!")
-        else:
-            raise FileNotFoundError(
-                errno.ENOENT, os.strerror(errno.ENOENT), MODEL_PATH)
+        load_model_from_disk(MODEL_PATH)
+
+
+def require_model():
+    if model_artifacts is None:
+        raise HTTPException(status_code=503, detail="No model is loaded. Train a model with /train first.")
 
 
 @app.get("/", include_in_schema=False)
@@ -133,31 +155,30 @@ async def model_info():
     """Return model information"""
     return JSONResponse(content={
         "name": MODEL_NAME,
-        "version": MODEL_VERSION,
+        "version": read_model_version(MODEL_VERSION_PATH),
         "description": "Predict churn based on customer data",
-        "is_artifacts_available": str(os.path.exists(MODEL_PATH))
+        "is_artifacts_available": str(os.path.exists(MODEL_PATH)),
+        "model_loaded": model_artifacts is not None,
+        "manifest": read_model_manifest(MODEL_MANIFEST_PATH),
     })
 
 
 @app.get('/healthcheck')
 def healthcheck():
-    return JSONResponse(content={"detail": "OK"})
+    return JSONResponse(content={"detail": "OK", "model_loaded": model_artifacts is not None})
 
 
 @app.post('/predict', response_model=ChurnPrediction, name='Predict churner', tags=['predict'])
-async def predict(request: Request, payload: CustomerData):
+async def predict(payload: CustomerData):
     """
     It takes in a `CustomerData` object, and returns a prediction
 
-    :param request: The request object that was sent to the server
-    :type request: Request
     :param payload: The data that is passed in the request body
     :type payload: CustomerData
     :return: a churn prediction.
     """
-    global model_artifacts
-    if request.method == "POST":
-        return get_churn_prediction(payload, model_artifacts)
+    require_model()
+    return get_churn_prediction(payload, model_artifacts)
 
 
 @app.post('/batch-predict', name='Moke predictions in batch', tags=['predict'])
@@ -172,6 +193,7 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
     :return: A StreamingResponse object is being returned.
     """
     """Predict with file input"""
+    require_model()
     global model_artifacts
     if request.method == "POST":
         # Ensure that the file is a CSV
@@ -200,6 +222,16 @@ async def predict_batch(request: Request, file: UploadFile = File(...)):
     return response
 
 
+def run_training_and_reload(dataset_path, model_path, model_metric_path, model_version_path, model_manifest_path):
+    """
+    Trains a new model, then loads it into memory so that /predict uses it without a restart.
+    Runs as a background task; if training fails, the previously loaded model stays in use.
+    """
+    execute_pipeline(dataset_path, model_path, model_metric_path, model_version_path,
+                     message="Model created", model_manifest_path=model_manifest_path)
+    load_model_from_disk(model_path)
+
+
 @app.get('/train', name='Train model', tags=['train'])
 async def train(background_tasks: BackgroundTasks, commons: dict = Depends(common_parameters)):
     """
@@ -211,9 +243,9 @@ async def train(background_tasks: BackgroundTasks, commons: dict = Depends(commo
     :type commons: dict
     :return: A JSONResponse object
     """
-    background_tasks.add_task(execute_pipeline, commons["dataset_path"], commons["model_path"],
-                              commons["model_metric_path"],
-                              commons["model_version_path"], message="Model created")
+    background_tasks.add_task(run_training_and_reload, commons["dataset_path"], commons["model_path"],
+                              commons["model_metric_path"], commons["model_version_path"],
+                              commons["model_manifest_path"])
 
     return JSONResponse(content={"detail": "Model training job has been created!"})
 

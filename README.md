@@ -104,4 +104,4 @@ L'application est disponible à l'adresse suivante : http://localhost:5000/
 
 ### Test auto
 
-Exécuter la commande `pytest` n'importe où dans le répertoire backend
+Installer les dépendances de test avec `pip install -r requirements-dev.txt` (dans le répertoire backend), puis exécuter la commande `pytest` n'importe où dans le répertoire backend. Les tests travaillent sur des copies temporaires : les fichiers versionnés du répertoire `backend/app/tests/models` ne sont pas modifiés.

@@ -1,3 +1,5 @@
 Flask==2.1.0
+# Flask 2.1.x imports werkzeug.urls.url_quote, which was removed in Werkzeug 3.0
+Werkzeug<3
 gunicorn
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability

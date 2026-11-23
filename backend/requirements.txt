@@ -1,4 +1,7 @@
-fastapi
+# fastapi/starlette are pinned to the last releases that support pydantic 1.x,
+# which the schemas in app/core/schemas/schema.py depend on.
+fastapi==0.99.1
+starlette==0.27.0
 joblib==1.1.1
 numpy==1.22.2
 pandas==1.3.4
