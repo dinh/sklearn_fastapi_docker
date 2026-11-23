@@ -34,11 +34,14 @@ $ curl -X 'GET' \
 -H 'accept: application/json'
 ```
 
-génères trois fichiers :
+génères quatre fichiers :
 
 * Le modèle ML: models/churn-model.dat.gz
 * Historique des mesures de performance du modèle à des fins de supervision: models/churn-model-metrics.txt
 * La dernière version du modèle : model/churn-model-latest-version.txt. Le numéro de version est incrémenté à chaque entrainement
+* Le manifeste d'entrainement (versions de numpy, pandas, scikit-learn, joblib) : models/churn-model.manifest.json. Il est renvoyé par `/info`
+
+Le modèle est rechargé automatiquement par l'API à la fin de l'entrainement ; il n'est pas nécessaire de redémarrer le conteneur. Si aucun modèle n'existe au démarrage, l'API démarre quand même : `/healthcheck` indique `model_loaded: false` et les endpoints de prédiction répondent 503 jusqu'au premier entrainement.
 
 Pour récupérer ces fichiers sur la machine host :
 

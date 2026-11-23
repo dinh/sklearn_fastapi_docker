@@ -1,10 +1,14 @@
+import json
 import os
+import platform
 import tempfile
+from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
 import joblib
 import gzip
+import sklearn
 from io import BytesIO
 
 from sklearn.ensemble import GradientBoostingClassifier
@@ -100,7 +104,59 @@ def prepare_churn_dataset(df):
     return df
 
 
-def train_and_save_model(df, model_path, model_metric_path, model_version_path):
+def read_model_version(model_version_path):
+    """
+    Returns the latest model version written by training, or None if no version has been recorded yet
+
+    :param model_version_path: The path to the file that stores the model version
+    :return: The version as an int, or None
+    """
+    if not os.path.exists(model_version_path):
+        return None
+    with open(model_version_path) as f:
+        try:
+            return int(f.read().strip())
+        except ValueError:
+            return None
+
+
+def read_model_manifest(model_manifest_path):
+    """
+    Returns the manifest written at training time (versions of the libraries used), or None if absent
+
+    :param model_manifest_path: The path to the manifest JSON file
+    :return: A dict, or None
+    """
+    if not os.path.exists(model_manifest_path):
+        return None
+    with open(model_manifest_path) as f:
+        return json.load(f)
+
+
+def write_model_manifest(model_manifest_path, version):
+    """
+    Records the model version and the library versions used to train it, so that a model can be
+    checked against the environment that loads it
+
+    :param model_manifest_path: The path to the manifest JSON file
+    :param version: The model version just trained
+    """
+    manifest = {
+        "model_version": version,
+        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "python": platform.python_version(),
+        "libraries": {
+            "numpy": np.__version__,
+            "pandas": pd.__version__,
+            "scikit-learn": sklearn.__version__,
+            "joblib": joblib.__version__,
+        },
+    }
+    with open(model_manifest_path, "w") as f:
+        json.dump(manifest, f, indent=2)
+
+
+def train_and_save_model(df, model_path, model_metric_path, model_version_path, model_manifest_path=None):
     """
     It takes a dataframe, trains a model, and saves the model to a file
 
@@ -108,6 +164,7 @@ def train_and_save_model(df, model_path, model_metric_path, model_version_path):
     :param model_path: The path to the model file
     :param model_metric_path: The path to the file where we'll store the model's accuracy
     :param model_version_path: The path to the file that stores the model version
+    :param model_manifest_path: Optional path where the training environment manifest is written
     """
     X, y = df.drop("Churn", axis=1), df.Churn
     # Split into train and test set
@@ -155,17 +212,14 @@ def train_and_save_model(df, model_path, model_metric_path, model_version_path):
         f.close()
 
     # save model version
-    version = 1
-    if os.path.exists(model_version_path):
-        with open(model_version_path) as f:
-            line_value = f.readlines()
-            if line_value:
-                version = int(int(line_value[0])) + 1
-        f.close()
+    previous_version = read_model_version(model_version_path)
+    version = (previous_version or 0) + 1
 
     with open(model_version_path, 'w') as f:
         f.write(str(version))
-        f.close()
+
+    if model_manifest_path:
+        write_model_manifest(model_manifest_path, version)
 
 
 def batch_file_predict(customer_data, model):
@@ -220,7 +274,8 @@ def batch_file_predict(customer_data, model):
     return pd.concat([df[["customerID", "Churn"]], df_prediction], axis=1)
 
 
-def execute_pipeline(dataset_path, model_path, model_metric_path, model_version_path, message=""):
+def execute_pipeline(dataset_path, model_path, model_metric_path, model_version_path, message="",
+                     model_manifest_path=None):
     """
     It reads the dataset, prepares it, trains a model and saves it
 
@@ -229,9 +284,10 @@ def execute_pipeline(dataset_path, model_path, model_metric_path, model_version_
     :param model_metric_path: The path to the model metrics file
     :param model_version_path: The path to the model version file
     :param message: a string that will be printed to the console when the task is finished
+    :param model_manifest_path: Optional path where the training environment manifest is written
     """
     df = pd.read_csv(dataset_path)
     df = prepare_churn_dataset(df)
-    train_and_save_model(df, model_path, model_metric_path, model_version_path)
+    train_and_save_model(df, model_path, model_metric_path, model_version_path, model_manifest_path)
     # TODO: send notification when the task has finished
     print(message)
